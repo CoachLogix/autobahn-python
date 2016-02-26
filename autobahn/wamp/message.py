@@ -272,7 +272,7 @@ class Hello(Message):
     The WAMP message code for this type of message.
     """
 
-    def __init__(self, realm, roles, authmethods=None, authid=None, authrole=None, authextra=None):
+    def __init__(self, realm, roles, authmethods=None, authid=None, authrole=None, authextra=None, **kwargs):
         """
 
         :param realm: The URI of the WAMP realm to join.
@@ -302,6 +302,9 @@ class Hello(Message):
         assert(authrole is None or type(authrole) == six.text_type)
         assert(authextra is None or type(authextra) == dict)
 
+        transport_info = kwargs.get('transport_info')
+        assert(transport_info is None or type(transport_info) == dict)
+
         Message.__init__(self)
         self.realm = realm
         self.roles = roles
@@ -309,6 +312,7 @@ class Hello(Message):
         self.authid = authid
         self.authrole = authrole
         self.authextra = authextra
+        self.transport_info = transport_info
 
     @staticmethod
     def parse(wmsg):
@@ -394,7 +398,12 @@ class Hello(Message):
 
             authextra = details_authextra
 
-        obj = Hello(realm, roles, authmethods, authid, authrole, authextra)
+        transport_info = None
+        if u'transport_info' in details:
+            details_transportinfo = details[u'transportinfo']
+            transport_info = details_transportinfo
+
+        obj = Hello(realm, roles, authmethods, authid, authrole, authextra, transport_info)
 
         return obj
 
