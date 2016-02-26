@@ -1,3 +1,9 @@
+# ignore venv
+bin
+include
+lib
+local 
+
 *.pyc
 *.pyo
 *.dat

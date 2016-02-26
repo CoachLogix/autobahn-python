@@ -213,9 +213,12 @@ class HelloDetails(object):
         'authextra',
         'session_roles',
         'pending_session',
+        'request_data'
     )
 
-    def __init__(self, realm=None, authmethods=None, authid=None, authrole=None, authextra=None, session_roles=None, pending_session=None):
+    def __init__(self, realm=None, authmethods=None, authid=None,
+                 authrole=None, authextra=None, session_roles=None,
+                 pending_session=None, **kwargs):
         """
 
         :param realm: The realm the client wants to join.
@@ -234,12 +237,15 @@ class HelloDetails(object):
         :type pending_session: int or None
         """
         assert(realm is None or type(realm) == six.text_type)
-        assert(authmethods is None or (type(authmethods) == list and all(type(x) == six.text_type for x in authmethods)))
+        assert((authmethods is None) or
+               ((type(authmethods) == list)
+                and all(type(x) == six.text_type for x in authmethods)))
         assert(authid is None or type(authid) == six.text_type)
         assert(authrole is None or type(authrole) == six.text_type)
         assert(authextra is None or type(authextra) == dict)
         # assert(session_roles is None or ...)  # FIXME
-        assert(pending_session is None or type(pending_session) in six.integer_types)
+        assert((pending_session is None) or
+               (type(pending_session) in six.integer_types))
 
         self.realm = realm
         self.authmethods = authmethods
@@ -248,9 +254,15 @@ class HelloDetails(object):
         self.authextra = authextra
         self.session_roles = session_roles
         self.pending_session = pending_session
+        self.request_data = kwargs.get('request_data')
 
     def __str__(self):
-        return "HelloDetails(realm=<{}>, authmethods={}, authid=<{}>, authrole=<{}>, authextra={}, session_roles={}, pending_session={})".format(self.realm, self.authmethods, self.authid, self.authrole, self.authextra, self.session_roles, self.pending_session)
+        return ("HelloDetails(realm=<{}>, authmethods={}, authid=<{}>, "
+                "authrole=<{}>, authextra={}, session_roles={}, "
+                "pending_session={}, request_data={})"
+                "".format(self.realm, self.authmethods, self.authid,
+                          self.authrole, self.authextra, self.session_roles,
+                          self.pending_session, self.request_data))
 
 
 class SessionDetails(object):
