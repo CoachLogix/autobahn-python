@@ -400,7 +400,7 @@ class Hello(Message):
 
         transport_info = None
         if u'transport_info' in details:
-            details_transportinfo = details[u'transportinfo']
+            details_transportinfo = details[u'transport_info']
             transport_info = details_transportinfo
 
         obj = Hello(realm, roles, authmethods, authid, authrole, authextra, transport_info=transport_info)
