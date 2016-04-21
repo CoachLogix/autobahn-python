@@ -60,7 +60,7 @@ class WampWebSocketProtocol(object):
             self._session = self.factory._factory()
             self._session.onOpen(self)
         except Exception as e:
-            self.log.critical(traceback.format_exc())
+            self.log.critical("{tb}", tb=traceback.format_exc())
             reason = u'WAMP Internal Error ({0})'.format(e)
             self._bailout(protocol.WebSocketProtocol.CLOSE_STATUS_CODE_INTERNAL_ERROR, reason=reason)
 
@@ -77,7 +77,7 @@ class WampWebSocketProtocol(object):
                 self.log.debug('WAMP-over-WebSocket transport lost: wasClean={wasClean}, code={code}, reason="{reason}"', wasClean=wasClean, code=code, reason=reason)
                 self._session.onClose(wasClean)
             except Exception:
-                self.log.critical(traceback.format_exc())
+                self.log.critical("{tb}", tb=traceback.format_exc())
             self._session = None
 
     def onMessage(self, payload, isBinary):
@@ -99,12 +99,12 @@ class WampWebSocketProtocol(object):
                 self._session.onMessage(msg)
 
         except ProtocolError as e:
-            self.log.critical(traceback.format_exc())
+            self.log.critical("{tb}", tb=traceback.format_exc())
             reason = u'WAMP Protocol Error ({0})'.format(e)
             self._bailout(protocol.WebSocketProtocol.CLOSE_STATUS_CODE_PROTOCOL_ERROR, reason=reason)
 
         except Exception as e:
-            self.log.critical(traceback.format_exc())
+            self.log.critical("{tb}", tb=traceback.format_exc())
             reason = u'WAMP Internal Error ({0})'.format(e)
             self._bailout(protocol.WebSocketProtocol.CLOSE_STATUS_CODE_INTERNAL_ERROR, reason=reason)
 
@@ -114,7 +114,12 @@ class WampWebSocketProtocol(object):
         """
         if self.isOpen():
             try:
-                self.log.trace("WAMP SEND: message={message}, session={session}, authid={authid}", authid=self._session._authid, session=self._session._session_id, message=msg)
+                self.log.trace(
+                    "WAMP SEND: message={message}, session={session}, authid={authid}",
+                    authid=self._session._authid,
+                    session=self._session._session_id,
+                    message=msg,
+                )
                 payload, isBinary = self._serializer.serialize(msg)
             except Exception as e:
                 self.log.error("WAMP message serialization error")
@@ -251,6 +256,14 @@ class WampWebSocketFactory(object):
                 from autobahn.wamp.serializer import MsgPackSerializer
                 serializers.append(MsgPackSerializer(batched=True))
                 serializers.append(MsgPackSerializer())
+            except ImportError:
+                pass
+
+            # try UBJSON WAMP serializer
+            try:
+                from autobahn.wamp.serializer import UBJSONSerializer
+                serializers.append(UBJSONSerializer(batched=True))
+                serializers.append(UBJSONSerializer())
             except ImportError:
                 pass
 

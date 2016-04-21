@@ -57,9 +57,10 @@ class ComponentConfig(object):
         'realm',
         'extra',
         'keyring',
+        'controller'
     )
 
-    def __init__(self, realm=None, extra=None, keyring=None):
+    def __init__(self, realm=None, extra=None, keyring=None, controller=None):
         """
 
         :param realm: The realm the session should join.
@@ -75,7 +76,10 @@ class ComponentConfig(object):
             symmetric message key, which in turn is encrypted using the "to" URI (topic being
             published to or procedure being called) public key and the "from" URI
             private key. In both cases, the key for the longest matching URI is used.
-        :type keyring: obj implementing IKeyRing
+        :type keyring: obj implementing IKeyRing or None
+        :param controller: A WAMP ApplicationSession instance that holds a session to
+            a controlling entity.
+        :type controller: instance of ApplicationSession or None
         """
         assert(realm is None or type(realm) == six.text_type)
         # assert(keyring is None or ...) # FIXME
@@ -83,9 +87,10 @@ class ComponentConfig(object):
         self.realm = realm
         self.extra = extra
         self.keyring = keyring
+        self.controller = controller
 
     def __str__(self):
-        return "ComponentConfig(realm=<{0}>, extra={1}, keyring={2})".format(self.realm, self.extra, self.keyring)
+        return "ComponentConfig(realm=<{0}>, extra={1}, keyring={2}, controller={3})".format(self.realm, self.extra, self.keyring, self.controller)
 
 
 class HelloReturn(object):
@@ -374,7 +379,7 @@ class SubscribeOptions(object):
         """
         options = {}
 
-        if self.match:
+        if self.match is not None:
             options[u'match'] = self.match
 
         return options
@@ -508,28 +513,28 @@ class PublishOptions(object):
         """
         options = {}
 
-        if self.acknowledge:
+        if self.acknowledge is not None:
             options[u'acknowledge'] = self.acknowledge
 
-        if self.exclude_me:
+        if self.exclude_me is not None:
             options[u'exclude_me'] = self.exclude_me
 
-        if self.exclude:
+        if self.exclude is not None:
             options[u'exclude'] = self.exclude if type(self.exclude) == list else [self.exclude]
 
-        if self.exclude_authid:
+        if self.exclude_authid is not None:
             options[u'exclude_authid'] = self.exclude_authid if type(self.exclude_authid) == list else self.exclude_authid
 
-        if self.exclude_authrole:
+        if self.exclude_authrole is not None:
             options[u'exclude_authrole'] = self.exclude_authrole if type(self.exclude_authrole) == list else self.exclude_authrole
 
-        if self.eligible:
+        if self.eligible is not None:
             options[u'eligible'] = self.eligible if type(self.eligible) == list else self.eligible
 
-        if self.eligible_authid:
+        if self.eligible_authid is not None:
             options[u'eligible_authid'] = self.eligible_authid if type(self.eligible_authid) == list else self.eligible_authid
 
-        if self.eligible_authrole:
+        if self.eligible_authrole is not None:
             options[u'eligible_authrole'] = self.eligible_authrole if type(self.eligible_authrole) == list else self.eligible_authrole
 
         return options
@@ -571,10 +576,10 @@ class RegisterOptions(object):
         """
         options = {}
 
-        if self.match:
+        if self.match is not None:
             options[u'match'] = self.match
 
-        if self.invoke:
+        if self.invoke is not None:
             options[u'invoke'] = self.invoke
 
         return options
@@ -669,10 +674,10 @@ class CallOptions(object):
         """
         options = {}
 
-        if self.timeout:
+        if self.timeout is not None:
             options[u'timeout'] = self.timeout
 
-        if self.on_progress:
+        if self.on_progress is not None:
             options[u'receive_progress'] = True
 
         return options
